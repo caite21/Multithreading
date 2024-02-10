@@ -1,1 +1,1 @@
-# Multithreading
+# Parallel Programming 
