@@ -4,6 +4,9 @@
 2 gtime
 3 gtime
 
+1 put index1.html
+1 put movie1.mp4
+2 put movie2.mp4
 1 put A1.pdf
 2 put A2.pdf
 3 put A3.pdf

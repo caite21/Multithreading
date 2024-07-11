@@ -175,7 +175,7 @@ int main (int argc, char *argv[]) {
 // Server function: Stores the object name or sends an error if the object already exists
 int server_put(struct Packet * p_rec, struct Packet * p, struct FileSys * fs) {
     for(int i = 0; i < fs->index; i++)  {
-        if (!strcmp(fs->files[i], p_rec->message)) {
+        if (strcmp(fs->files[i], p_rec->message) == 0) {
             strcpy(p->type, "ERROR");
             strcpy(p->message, "object already exists");
             return 1;
@@ -191,7 +191,7 @@ int server_put(struct Packet * p_rec, struct Packet * p, struct FileSys * fs) {
 int server_del(struct Packet * p_rec, struct Packet * p, struct FileSys * fs) {
     int index_to_delete = -1;
     for(int i = 0; i < fs->index; i++)  {
-        if (!strcmp(fs->files[i], p_rec->message)) {
+        if (strcmp(fs->files[i], p_rec->message) == 0) {
             if (fs->owners[i] != p_rec->id) {
                 strcpy(p->type, "ERROR");
                 strcpy(p->message, "client not owner");
@@ -209,7 +209,8 @@ int server_del(struct Packet * p_rec, struct Packet * p, struct FileSys * fs) {
         return 1;
     } 
     else {
-        strcpy(fs->files[index_to_delete], "");  // leaves hole
+        // Leaves hole that is not shown when printing file system
+        strcpy(fs->files[index_to_delete], ""); 
     }
     return 0;
 }
@@ -217,7 +218,7 @@ int server_del(struct Packet * p_rec, struct Packet * p, struct FileSys * fs) {
 // Server function: Sends the object name or sends an error if object does not exist
 int server_get(struct Packet * p_rec, struct Packet * p, struct FileSys * fs) {
     for(int i = 0; i < fs->index; i++)  {
-        if (!strcmp(fs->files[i], p_rec->message)) {
+        if (strcmp(fs->files[i], p_rec->message) == 0) {
             return 0;
         }
     }
@@ -230,7 +231,9 @@ int server_get(struct Packet * p_rec, struct Packet * p, struct FileSys * fs) {
 void server_print(struct FileSys * fs) {
     printf("Object Table:\n");
     for(int i = 0; i < fs->index; i++) {
-        printf("(owner: %d, name= %s)\n", fs->owners[i], fs->files[i]);
+        if (strcmp(fs->files[i], "") != 0) {
+            printf("(owner: %d, name= %s)\n", fs->owners[i], fs->files[i]);
+        }
     }
     printf("\n");
 }

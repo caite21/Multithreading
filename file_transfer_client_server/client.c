@@ -115,7 +115,7 @@ int main (int argc, char *argv[]) {
                     break;
                 }
             }
-            else if (!strcmp(tokens[1], "gtime")) {
+            else if (strcmp(tokens[1], "gtime") == 0) {
                 write(write_fifo, &p, sizeof(p));
                 printf("Transmitted (src= client:%d) %s\n", id, p.type);
                 if (recv_packet(read_fifo) != 0) {
