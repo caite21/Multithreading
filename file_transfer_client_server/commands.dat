@@ -1,33 +1,40 @@
-# Transactions file for 2 clients
-# a2p2 -s
-# a2p2 -c 1 a2p2-ex1.dat
-# a2p2 -c 2 a2p2-ex1.dat
+# Commands for 3 clients
 
 1 gtime
-1 put index1.html
-1 put img1.jpg
-1 put video1.mp4
-# putting an object that already exists, should error
-1 put img1.jpg
-1 delay 2500
-
 2 gtime
-2 put index2.html
-2 delete index1.html
-2 put img2.jpg
-2 put video2.mp4
-2 delay 1500
+3 gtime
+
+1 put A1.pdf
+2 put A2.pdf
+3 put A3.pdf
+
+1 put B1.jpg
+2 put B2.jpg
+3 put B3.jpg
 
 1 gtime
-1 get index2.html
-# doesn't exist, should error
-1 get index3.html
-# deleting another's, should error
-1 delete img2.jpg
-1 delay 3000
+2 gtime
+3 gtime
+
+# putting an object that exists: error
+1 put B1.jpg
+1 delay 3500
+# doesn't exist: error
+2 get C.html
+2 delay 2500
+# deleting another's: error
+3 delete B1.jpg
+3 delay 1500
 
 1 gtime
+2 gtime
+3 gtime
+
+# the following do not error
+1 delete A1.pdf
+2 get B1.jpg
+3 put ABC.dat
+
 1 quit
-
-2 gtime
 2 quit
+3 quit
