@@ -5,11 +5,20 @@ int TaskManager::getNumTasks() {
 	return numTasks;
 }
 
-/* Get the elapsed time in milliseconds */
-double TaskManager::get_time(struct timespec * start, struct timespec * end) {
-	double time = (end->tv_sec - start->tv_sec + 
-		(end->tv_nsec - start->tv_nsec)/1E9) * 1000;
+/* Get the duration of start to end in milliseconds */
+double TaskManager::getDuration(struct timespec &start, struct timespec &end) {
+	double time = (end.tv_sec - start.tv_sec + (end.tv_nsec - start.tv_nsec)/1E9) * 1000;
 	return time; // in milliseconds
+}
+
+/* Get the elapsed time in milliseconds */
+void TaskManager::setTimespec(int ms, struct timespec &delayTimespec) {
+	// put times into timespec structs: convert ms into {s, ns}
+	double timeSeconds = (double) (ms)/1000;
+	int timeInt = (int) timeSeconds;
+	delayTimespec.tv_sec = timeInt;
+	delayTimespec.tv_nsec = (int) ((timeSeconds - timeInt) * 1e9);
+	return;
 }
 
 /* Check if all resources needed by the task are available */
@@ -138,17 +147,8 @@ int TaskManager::parseInput(const char *inputFile) {
 				task.name = tokens[1];
 				task.busyTime = stoi(tokens[2]); 
 				task.idleTime = stoi(tokens[3]); 
-
-				// put times in timespec structs: convert ms into {s, ns}
-				double time_sec = (double)(task.busyTime)/1000;
-				int time_int = (int) time_sec;
-				task.busy_timespec.tv_sec = time_int;
-				task.busy_timespec.tv_nsec = (int) ((time_sec - time_int) * 1e9);
-				// same with idleTime
-				time_sec = (double)(task.idleTime)/1000;
-				time_int = (int) time_sec;
-				task.idle_timespec.tv_sec = time_int;
-				task.idle_timespec.tv_nsec = (int) ((time_sec - time_int) * 1e9);
+				setTimespec(task.busyTime, task.busyTimespec);
+				setTimespec(task.idleTime, task.idleTimespec);
 
 				// Add needed resource to task
 				for (uint i = 4; i < tokens.size(); i++) {
@@ -173,4 +173,3 @@ int TaskManager::parseInput(const char *inputFile) {
 	file.close();
 	return 0;
 }
-

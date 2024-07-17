@@ -14,8 +14,8 @@ struct Task {
     int busyTime = 0;
     int idleTime = 0;
     int timeSpentWaiting = 0;
-    struct timespec busy_timespec = {0, 0};
-    struct timespec idle_timespec = {0, 0};
+    struct timespec busyTimespec = {0, 0};
+    struct timespec idleTimespec = {0, 0};
     
     unordered_map<string, int> resourcesNeededDict;
     unordered_map<string, int> holdingDict;

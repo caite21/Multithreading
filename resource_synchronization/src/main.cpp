@@ -30,7 +30,6 @@ int main (int argc, char *argv[]) {
 	// Read resources and tasks from input file
 	manager.parseInput(inputFile);
 	clock_gettime(CLOCK_MONOTONIC, &start);	
-	struct timespec end;
 	pthread_t tidMonitor;
 	pthread_t tids[manager.getNumTasks()];
 	int taskNums[manager.getNumTasks()];
@@ -74,8 +73,9 @@ int main (int argc, char *argv[]) {
 	manager.printTasks();
 
 	// Print total running time
+	struct timespec end;
 	clock_gettime(CLOCK_MONOTONIC, &end);
-	cout << "Running time= " << manager.get_time(&start, &end) << " ms" << endl;
+	cout << "Running time= " << manager.getDuration(start, end) << " ms" << endl;    
 
 	return 0;
 }
@@ -89,46 +89,44 @@ int main (int argc, char *argv[]) {
 void *doTask(void *taskNum) {
 	Task &task = manager.tasks[*((int*) taskNum)];
 	task.tid = pthread_self();
-
-	struct timespec end, wait_start, wait_end, delay;
-	delay.tv_nsec = 1e7; // 10ms delay for trying again
-	clock_gettime(CLOCK_MONOTONIC, &wait_start);
-	clock_gettime(CLOCK_MONOTONIC, &wait_end);
+	struct timespec end, waitStart, waitEnd, delay;
+	manager.setTimespec(10, delay); // 10ms delay before trying again
+	clock_gettime(CLOCK_MONOTONIC, &waitStart);
 
     while (task.iter < nIter) {
         pthread_mutex_lock(&mutex);
         if (manager.resourcesAreAvailable(task)) {
 			if (task.status == "WAIT") {
 				// Wait period done; add time spent waiting
-				clock_gettime(CLOCK_MONOTONIC, &wait_end);
-				task.timeSpentWaiting += manager.get_time(&wait_start, &wait_end);
+				clock_gettime(CLOCK_MONOTONIC, &waitEnd);
+				task.timeSpentWaiting += manager.getDuration(waitStart, waitEnd);
 			}
 			
 			// Simulate running task; hold necessary resources for busyTime  
 			manager.grabResources(task);
 			task.status = "RUN";
 			pthread_mutex_unlock(&mutex);
-			nanosleep(&(task.busy_timespec), NULL);
+			nanosleep(&(task.busyTimespec), NULL);
 
 			// Simulate idle task; release resources for idleTime
 			pthread_mutex_lock(&mutex);
 			manager.releaseResources(task);
 			task.status = "IDLE";
 			pthread_mutex_unlock(&mutex);
-			nanosleep(&(task.idle_timespec), NULL);
+			nanosleep(&(task.idleTimespec), NULL);
 
 			// Iteration complete
 			clock_gettime(CLOCK_MONOTONIC, &end);
 			pthread_mutex_lock(&mutex);
 			task.iter++;
-			cout << "task complete: " << task.name << " (iter= " << task.iter << ", time= " << manager.get_time(&start, &end) << " ms)" << endl;
+			cout << "task complete: " << task.name << " (iter= " << task.iter << ", time= " << manager.getDuration(start, end) << " ms)" << endl;
 			pthread_mutex_unlock(&mutex);
         }
         else {
         	if (task.status != "WAIT") {
         		// Start wait period
 				task.status = "WAIT";
-				clock_gettime(CLOCK_MONOTONIC, &wait_start);
+				clock_gettime(CLOCK_MONOTONIC, &waitStart);
 				nanosleep(&delay, NULL);
         	}
         	pthread_mutex_unlock(&mutex);
@@ -142,15 +140,8 @@ void *doTask(void *taskNum) {
 	the tasks can be monitored from standard output.
 */
 void *doMonitor(void *_) {
-	struct timespec monitor_timespec;
-	double time_sec;
-	int time_int;
-
-	// put times into timespec structs: convert ms into {s, ns}
-	time_sec = (double)(monitorTime)/1000;
-	time_int = (int) time_sec;
-	monitor_timespec.tv_sec = time_int;
-	monitor_timespec.tv_nsec = (int) ((time_sec - time_int) * 1e9);
+	struct timespec delay;
+	manager.setTimespec(monitorTime, delay);
 
 	// Continuously print until thread is cancelled
 	while (true) {
@@ -159,6 +150,6 @@ void *doMonitor(void *_) {
 		manager.printMonitor();
 		pthread_mutex_unlock(&mutex);
 		// Print every monitorTime interval
-		nanosleep(&monitor_timespec, NULL);
+		nanosleep(&delay, NULL);
 	}
 }

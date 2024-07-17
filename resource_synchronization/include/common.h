@@ -4,7 +4,6 @@
 #include <iostream>
 #include <string>
 #include <pthread.h>
-#include <chrono>
 #include <vector>
 #include <fstream>
 #include <sstream>

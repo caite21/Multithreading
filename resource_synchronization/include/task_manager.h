@@ -11,14 +11,18 @@ class TaskManager {
 		
 		int getNumTasks();
 		int parseInput(const char *inputFile);
-		double get_time(struct timespec * start, struct timespec * end);
+
+		double getDuration(struct timespec &start, struct timespec &end);
+		void setTimespec(int ms, struct timespec &delayTimespec);
+
 		bool resourcesAreAvailable(Task &task);
 		void grabResources(Task &task);
 		void releaseResources(Task &task);
+
 		void printMonitor();
 		void printTasks();
 		void printResources();
-		
+
 	private:
 		int numTasks = 0;
 		unordered_map<string, int> resourcesAvailableDict;

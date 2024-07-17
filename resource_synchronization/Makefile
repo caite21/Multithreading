@@ -14,7 +14,7 @@ clean:
 	-rm -rf $(TARGET)
 
 run: $(TARGET)
-	./$(TARGET) data/main-tests.dat 500 2
+	./$(TARGET) data/main-tests.dat 575 2
 
 test: $(TARGET)
 	@echo "Running Tests:"
