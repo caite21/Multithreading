@@ -1,30 +1,20 @@
-/*
-	Synchronizing threads with a mutex
-
-	Files:
-	- main.cpp
-	- system.h
-	- main-tests.dat
-*/
-
-#include "../include/system.h"
+#include "../include/task_manager.h"
 
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-System sys;
+TaskManager manager;
 struct timespec start;
 int monitorTime;
 int nIter;
 
-// function prototypes for task threads and monitor thread
-void *do_task(void *arguments);
-void *do_monitor(void *arguments);
+// Function prototypes for task threads and monitor thread
+void *doTask(void *taskNum);
+void *doMonitor(void *_);
 
 
 /*
-	Description: Parses the inputFile into an instance of the System class
-	and creates the threads. When the tasks are done, it cancels the 
-	monitor threads and prints out the system resources and tasks.
+	Parses the inputFile into a TaskManager. Creates monitor thread and
+	task threads. Prints out the TaskManager details at end.
 */
 int main (int argc, char *argv[]) {
 	if(argc != 4) {
@@ -37,41 +27,36 @@ int main (int argc, char *argv[]) {
 	nIter = atoi(argv[3]);
 	cout << "main: inputFile=" << inputFile << ", monitorTime=" << monitorTime << ", nIter=" << nIter << endl;
 
-	// Read system parameters from input file
-	read_system_params(inputFile, &sys);
+	// Read resources and tasks from input file
+	manager.parseInput(inputFile);
 	clock_gettime(CLOCK_MONOTONIC, &start);	
 	struct timespec end;
 	pthread_t tidMonitor;
-	pthread_t tids[sys.numTasks];
-	int threadNums[sys.numTasks];
+	pthread_t tids[manager.getNumTasks()];
+	int taskNums[manager.getNumTasks()];
 
-	for (int i = 0; i < sys.numTasks; i++) {
-		threadNums[i] = i;
+	for (int i = 0; i < manager.getNumTasks(); i++) {
+		taskNums[i] = i;
 	}
 
-	// Lock until all threads are created properly
+	// Lock until monitor thread and task threads are created
 	pthread_mutex_lock(&mutex); 
-
-	// Create monitor thread
-	int err = pthread_create(&tidMonitor, nullptr, do_monitor, nullptr);
+	int err = pthread_create(&tidMonitor, nullptr, doMonitor, nullptr);
 	if (err != 0) {
 		cerr << "Error creating monitor thread" << endl;
 		exit(EXIT_FAILURE);
 	}
-	
-	// Create task threads
-	for (int i = 0; i < sys.numTasks; i++) {
-		int err = pthread_create(&tids[i], nullptr, do_task, (void *)&threadNums[i]);
+	for (int i = 0; i < manager.getNumTasks(); i++) {
+		int err = pthread_create(&tids[i], nullptr, doTask, (void *)&taskNums[i]);
 		if (err != 0) {
 			cerr << "Error creating task thread" << endl;
 			exit(EXIT_FAILURE);
 		}
 	}
-
 	pthread_mutex_unlock(&mutex);
 
 	// Join task threads
-	for (int i = 0; i < sys.numTasks; i++) {
+	for (int i = 0; i < manager.getNumTasks(); i++) {
 		int err = pthread_join(tids[i], nullptr);
 		if (err != 0) {
 			cerr << "Error joiining task thread" << endl;
@@ -84,27 +69,25 @@ int main (int argc, char *argv[]) {
 	pthread_cancel(tidMonitor);
 	pthread_mutex_unlock(&mutex);
 
-	// Print system
-	sys.print_system_resources();
-	sys.print_system_tasks();
+	// Print TaskManager details
+	manager.printResources();
+	manager.printTasks();
 
 	// Print total running time
 	clock_gettime(CLOCK_MONOTONIC, &end);
-	cout << "Running time= " << sys.get_time(&start, &end) << " ms" << endl;
+	cout << "Running time= " << manager.get_time(&start, &end) << " ms" << endl;
 
 	return 0;
 }
 
 /*
-	Description: A task repeatedly attempts to acquire all resource units needed 
+	A task thread repeatedly attempts to acquire all resource units needed 
 	by the task, holds the resources for busyTime millisec, releases all held 
-	resources, and then enters an idle period of idleTime millisec. Done NITER times.
-	Every step that changes the System is protected by locking a mutex.
+	resources, and then enters an idle period of idleTime millisec. Done nIter times.
+	Changes to the TaskManager are protected by locking a mutex.
 */
-void *do_task(void *arguments) {
-	// deconstruct arguments
-	int t_num = *((int*) arguments);
-	Task &task = sys.tasks[t_num];
+void *doTask(void *taskNum) {
+	Task &task = manager.tasks[*((int*) taskNum)];
 	task.tid = pthread_self();
 
 	struct timespec end, wait_start, wait_end, delay;
@@ -114,22 +97,22 @@ void *do_task(void *arguments) {
 
     while (task.iter < nIter) {
         pthread_mutex_lock(&mutex);
-
-        if (sys.resourcesAvailable(task)) {
+        if (manager.resourcesAreAvailable(task)) {
 			if (task.status == "WAIT") {
 				// Wait period done; add time spent waiting
 				clock_gettime(CLOCK_MONOTONIC, &wait_end);
-				task.time_spent_waiting += sys.get_time(&wait_start, &wait_end);
+				task.timeSpentWaiting += manager.get_time(&wait_start, &wait_end);
 			}
+			
 			// Simulate running task; hold necessary resources for busyTime  
-			sys.grab_resources(task);
+			manager.grabResources(task);
 			task.status = "RUN";
 			pthread_mutex_unlock(&mutex);
 			nanosleep(&(task.busy_timespec), NULL);
 
 			// Simulate idle task; release resources for idleTime
 			pthread_mutex_lock(&mutex);
-			sys.release_resources(task);
+			manager.releaseResources(task);
 			task.status = "IDLE";
 			pthread_mutex_unlock(&mutex);
 			nanosleep(&(task.idle_timespec), NULL);
@@ -138,7 +121,7 @@ void *do_task(void *arguments) {
 			clock_gettime(CLOCK_MONOTONIC, &end);
 			pthread_mutex_lock(&mutex);
 			task.iter++;
-			cout << "task complete: " << task.name << " (iter= " << task.iter << ", time= " << sys.get_time(&start, &end) << " ms)" << endl;
+			cout << "task complete: " << task.name << " (iter= " << task.iter << ", time= " << manager.get_time(&start, &end) << " ms)" << endl;
 			pthread_mutex_unlock(&mutex);
         }
         else {
@@ -155,10 +138,10 @@ void *do_task(void *arguments) {
 }
 
 /*
-	Description: Prints output every monitorTime millisec and uses a mutex
-	so that a task thread can't change its state when the monitor is printing.
+	Prints TaskManager details every monitorTime milliseconds so that 
+	the tasks can be monitored from standard output.
 */
-void *do_monitor(void *arguments) {
+void *doMonitor(void *_) {
 	struct timespec monitor_timespec;
 	double time_sec;
 	int time_int;
@@ -169,12 +152,13 @@ void *do_monitor(void *arguments) {
 	monitor_timespec.tv_sec = time_int;
 	monitor_timespec.tv_nsec = (int) ((time_sec - time_int) * 1e9);
 
-	// print task status until this thread is cancelled
+	// Continuously print until thread is cancelled
 	while (true) {
+		// Lock so task threads can't change states while the monitor is printing
 		pthread_mutex_lock(&mutex);
-		sys.print_monitor();
+		manager.printMonitor();
 		pthread_mutex_unlock(&mutex);
-		// print every monitorTime interval
+		// Print every monitorTime interval
 		nanosleep(&monitor_timespec, NULL);
 	}
 }

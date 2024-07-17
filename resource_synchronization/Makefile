@@ -14,12 +14,12 @@ clean:
 	-rm -rf $(TARGET)
 
 run: $(TARGET)
-	./$(TARGET) data/edge-cases.dat 500 2
+	./$(TARGET) data/main-tests.dat 500 2
 
 test: $(TARGET)
 	@echo "Running Tests:"
-	@echo "Edge Cases"
-	./$(TARGET) data/edge-cases.dat 750 3 > $(OUTPUT_DIR)/edge-cases.txt
+	@echo "Main Test"
+	./$(TARGET) data/main-tests.dat 750 3 > $(OUTPUT_DIR)/edge-cases.txt
 	@echo "Basic Deadlock Scenario"
 	./$(TARGET) data/deadlock-scenario.dat 500 3 > $(OUTPUT_DIR)/deadlock-scenario.txt
 	@echo "Dining Philosophers Problem"
