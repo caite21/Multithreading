@@ -1,0 +1,5 @@
+resources RAM:2 ROM:2 SRAM:2
+# Deadlock scenario; these should never run at the same time
+task T1 400 300 RAM:2 ROM:1 SRAM:1
+task T2 400 300 RAM:1 ROM:2 SRAM:1
+task T3 400 300 RAM:1 ROM:1 SRAM:2

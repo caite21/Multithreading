@@ -1,0 +1,80 @@
+main: inputFile=data/deadlock-scenario.dat, monitorTime=500, nIter=3
+
+monitor: [WAIT] T3 
+	 [RUN]  T2 
+	 [IDLE] 
+
+
+monitor: [WAIT] T3 
+	 [RUN]  T1 
+	 [IDLE] T2 
+
+task: T2 (tid= 139825486591744, iter= 1, time= 700.788 ms)
+
+monitor: [WAIT] T3 
+	 [RUN]  T2 
+	 [IDLE] T1 
+
+task: T1 (tid= 139825494984448, iter= 1, time= 1100.8 ms)
+task: T2 (tid= 139825486591744, iter= 2, time= 1500.99 ms)
+
+monitor: [WAIT] T1 T2 
+	 [RUN]  T3 
+	 [IDLE] 
+
+task: T3 (tid= 139825478199040, iter= 1, time= 1900.99 ms)
+
+monitor: [WAIT] T2 
+	 [RUN]  T3 
+	 [IDLE] T1 
+
+task: T1 (tid= 139825494984448, iter= 2, time= 2301.12 ms)
+
+monitor: [WAIT] T1 
+	 [RUN]  T2 
+	 [IDLE] T3 
+
+task: T3 (tid= 139825478199040, iter= 2, time= 2701.15 ms)
+
+monitor: [WAIT] T3 
+	 [RUN]  T1 
+	 [IDLE] T2 
+
+task: T2 (tid= 139825486591744, iter= 3, time= 3101.3 ms)
+task: T1 (tid= 139825494984448, iter= 3, time= 3501.35 ms)
+
+monitor: [WAIT] 
+	 [RUN]  T3 
+	 [IDLE] T1 T2 
+
+task: T3 (tid= 139825478199040, iter= 3, time= 3901.53 ms)
+
+System Resources:
+	 RAM:	(maxAvail= 2, held= 0)
+	 ROM:	(maxAvail= 2, held= 0)
+	 SRAM:	(maxAvail= 2, held= 0)
+
+System Tasks:
+[0] T1 (IDLE, runTime= 400 msec, idleTime= 300 msec):
+	 (tid= 0x7f2ba8f58700)
+	 RAM:	(needed= 2, held= 0)
+	 ROM:	(needed= 1, held= 0)
+	 SRAM:	(needed= 1, held= 0)
+	 (RUN: 3 times, WAIT 1388 msec)
+
+[1] T2 (IDLE, runTime= 400 msec, idleTime= 300 msec):
+	 (tid= 0x7f2ba8757700)
+	 RAM:	(needed= 1, held= 0)
+	 ROM:	(needed= 2, held= 0)
+	 SRAM:	(needed= 1, held= 0)
+	 (RUN: 3 times, WAIT 999 msec)
+
+[2] T3 (IDLE, runTime= 400 msec, idleTime= 300 msec):
+	 (tid= 0x7f2ba7f56700)
+	 RAM:	(needed= 1, held= 0)
+	 ROM:	(needed= 1, held= 0)
+	 SRAM:	(needed= 2, held= 0)
+	 (RUN: 3 times, WAIT 1799 msec)
+
+
+Running time=3901.77ms

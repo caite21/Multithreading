@@ -1,0 +1,14 @@
+# Dining Philosophers Problem:
+#   The Dining Philosophers Problem involves five philosophers 
+#   sharing 5 chopsticks between them. They each need to pick up
+#   a chopstick to the left and right to eat. They risk deadlock 
+#   if they all pick up the left chopstick simultaneously.
+#   ex) philosopher_A -> chopstick_AB <- philosopher_B
+
+resources chopstick_AB:1 chopstick_BC:1 chopstick_CD:1 chopstick_DE:1 chopstick_EA:1
+
+task philosopher_A 500 500 chopstick_EA:1 chopstick_AB:1
+task philosopher_B 500 500 chopstick_AB:1 chopstick_BC:1
+task philosopher_C 500 500 chopstick_BC:1 chopstick_CD:1
+task philosopher_D 500 500 chopstick_CD:1 chopstick_DE:1
+task philosopher_E 500 500 chopstick_DE:1 chopstick_EA:1

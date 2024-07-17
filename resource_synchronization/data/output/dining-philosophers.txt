@@ -1,0 +1,107 @@
+main: inputFile=data/dining-philosophers.dat, monitorTime=500, nIter=3
+
+monitor: [WAIT] 
+	 [RUN]  
+	 [IDLE] 
+
+
+monitor: [WAIT] philosopher_B philosopher_C philosopher_E 
+	 [RUN]  philosopher_A philosopher_D 
+	 [IDLE] 
+
+
+monitor: [WAIT] philosopher_C 
+	 [RUN]  philosopher_B philosopher_E 
+	 [IDLE] philosopher_A philosopher_D 
+
+task: philosopher_A (tid= 140514373252864, iter= 1, time= 1000.98 ms)
+task: philosopher_D (tid= 140514348074752, iter= 1, time= 1010.95 ms)
+
+monitor: [WAIT] philosopher_D 
+	 [RUN]  philosopher_A philosopher_C 
+	 [IDLE] philosopher_B philosopher_E 
+
+task: philosopher_B (tid= 140514364860160, iter= 1, time= 1501.09 ms)
+task: philosopher_E (tid= 140514339682048, iter= 1, time= 1521.84 ms)
+
+monitor: [WAIT] philosopher_E 
+	 [RUN]  philosopher_B philosopher_D 
+	 [IDLE] philosopher_A philosopher_C 
+
+task: philosopher_C (tid= 140514356467456, iter= 1, time= 2011.55 ms)
+task: philosopher_A (tid= 140514373252864, iter= 2, time= 2032.33 ms)
+
+monitor: [WAIT] philosopher_A 
+	 [RUN]  philosopher_C philosopher_E 
+	 [IDLE] philosopher_B philosopher_D 
+
+task: philosopher_D (tid= 140514348074752, iter= 2, time= 2522 ms)
+task: philosopher_B (tid= 140514364860160, iter= 2, time= 2532.47 ms)
+
+monitor: [WAIT] philosopher_B 
+	 [RUN]  philosopher_A philosopher_D 
+	 [IDLE] philosopher_C philosopher_E 
+
+task: philosopher_E (tid= 140514339682048, iter= 2, time= 3022.03 ms)
+task: philosopher_C (tid= 140514356467456, iter= 2, time= 3042.91 ms)
+
+monitor: [WAIT] philosopher_C 
+	 [RUN]  philosopher_B philosopher_E 
+	 [IDLE] philosopher_A philosopher_D 
+
+task: philosopher_A (tid= 140514373252864, iter= 3, time= 3522.23 ms)
+task: philosopher_D (tid= 140514348074752, iter= 3, time= 3553.36 ms)
+
+monitor: [WAIT] 
+	 [RUN]  philosopher_C 
+	 [IDLE] philosopher_A philosopher_B philosopher_D philosopher_E 
+
+task: philosopher_B (tid= 140514364860160, iter= 3, time= 4032.5 ms)
+task: philosopher_E (tid= 140514339682048, iter= 3, time= 4053.61 ms)
+
+monitor: [WAIT] 
+	 [RUN]  
+	 [IDLE] philosopher_A philosopher_B philosopher_C philosopher_D philosopher_E 
+
+task: philosopher_C (tid= 140514356467456, iter= 3, time= 4532.55 ms)
+
+System Resources:
+	 chopstick_AB:	(maxAvail= 1, held= 0)
+	 chopstick_BC:	(maxAvail= 1, held= 0)
+	 chopstick_CD:	(maxAvail= 1, held= 0)
+	 chopstick_DE:	(maxAvail= 1, held= 0)
+	 chopstick_EA:	(maxAvail= 1, held= 0)
+
+System Tasks:
+[0] philosopher_A (IDLE, runTime= 500 msec, idleTime= 500 msec):
+	 (tid= 0x7fcc0d4db700)
+	 chopstick_EA:	(needed= 1, held= 0)
+	 chopstick_AB:	(needed= 1, held= 0)
+	 (RUN: 3 times, WAIT 509 msec)
+
+[1] philosopher_B (IDLE, runTime= 500 msec, idleTime= 500 msec):
+	 (tid= 0x7fcc0ccda700)
+	 chopstick_AB:	(needed= 1, held= 0)
+	 chopstick_BC:	(needed= 1, held= 0)
+	 (RUN: 3 times, WAIT 1029 msec)
+
+[2] philosopher_C (IDLE, runTime= 500 msec, idleTime= 500 msec):
+	 (tid= 0x7fcc0c4d9700)
+	 chopstick_BC:	(needed= 1, held= 0)
+	 chopstick_CD:	(needed= 1, held= 0)
+	 (RUN: 3 times, WAIT 1509 msec)
+
+[3] philosopher_D (IDLE, runTime= 500 msec, idleTime= 500 msec):
+	 (tid= 0x7fcc0bcd8700)
+	 chopstick_CD:	(needed= 1, held= 0)
+	 chopstick_DE:	(needed= 1, held= 0)
+	 (RUN: 3 times, WAIT 519 msec)
+
+[4] philosopher_E (IDLE, runTime= 500 msec, idleTime= 500 msec):
+	 (tid= 0x7fcc0b4d7700)
+	 chopstick_DE:	(needed= 1, held= 0)
+	 chopstick_EA:	(needed= 1, held= 0)
+	 (RUN: 3 times, WAIT 1020 msec)
+
+
+Running time=4534.13ms

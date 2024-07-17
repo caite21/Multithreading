@@ -1,0 +1,97 @@
+main: inputFile=data/edge-cases.dat, monitorTime=750, nIter=3
+
+monitor: [WAIT] 
+	 [RUN]  
+	 [IDLE] 
+
+task: T4_quick (tid= 140423987476224, iter= 1, time= 21.4785 ms)
+task: T4_quick (tid= 140423987476224, iter= 2, time= 21.8255 ms)
+task: T4_quick (tid= 140423987476224, iter= 3, time= 22.0072 ms)
+
+monitor: [WAIT] T3_HOG 
+	 [RUN]  T2_alt 
+	 [IDLE] T1_alt T4_quick 
+
+task: T1_alt (tid= 140424012654336, iter= 1, time= 1000.89 ms)
+
+monitor: [WAIT] T3_HOG 
+	 [RUN]  T1_alt 
+	 [IDLE] T2_alt T4_quick 
+
+task: T2_alt (tid= 140424004261632, iter= 1, time= 1511.22 ms)
+task: T1_alt (tid= 140424012654336, iter= 2, time= 2021.59 ms)
+
+monitor: [WAIT] T3_HOG 
+	 [RUN]  T1_alt 
+	 [IDLE] T2_alt T4_quick 
+
+task: T2_alt (tid= 140424004261632, iter= 2, time= 2531.94 ms)
+
+monitor: [WAIT] T3_HOG 
+	 [RUN]  T2_alt 
+	 [IDLE] T1_alt T4_quick 
+
+task: T1_alt (tid= 140424012654336, iter= 3, time= 3042.27 ms)
+task: T2_alt (tid= 140424004261632, iter= 3, time= 3542.36 ms)
+
+monitor: [WAIT] 
+	 [RUN]  
+	 [IDLE] T1_alt T2_alt T3_HOG T4_quick 
+
+task: T3_HOG (tid= 140423995868928, iter= 1, time= 3992.67 ms)
+
+monitor: [WAIT] 
+	 [RUN]  T3_HOG 
+	 [IDLE] T1_alt T2_alt T4_quick 
+
+task: T3_HOG (tid= 140423995868928, iter= 2, time= 4943.01 ms)
+
+monitor: [WAIT] 
+	 [RUN]  T3_HOG 
+	 [IDLE] T1_alt T2_alt T4_quick 
+
+task: T3_HOG (tid= 140423995868928, iter= 3, time= 5893.38 ms)
+
+System Resources:
+	 CPU1:	(maxAvail= 1, held= 0)
+	 CPU2:	(maxAvail= 2, held= 0)
+	 CPU3:	(maxAvail= 3, held= 0)
+	 Printer:	(maxAvail= 1, held= 0)
+	 MEM:	(maxAvail= 10, held= 0)
+	 Mouse:	(maxAvail= 1, held= 0)
+	 RAM:	(maxAvail= 2, held= 0)
+	 ROM:	(maxAvail= 2, held= 0)
+	 SRAM:	(maxAvail= 2, held= 0)
+
+System Tasks:
+[0] T1_alt (IDLE, runTime= 500 msec, idleTime= 500 msec):
+	 (tid= 0x7fb703646700)
+	 MEM:	(needed= 5, held= 0)
+	 Mouse:	(needed= 1, held= 0)
+	 (RUN: 3 times, WAIT 20 msec)
+
+[1] T2_alt (IDLE, runTime= 500 msec, idleTime= 500 msec):
+	 (tid= 0x7fb702e45700)
+	 Mouse:	(needed= 1, held= 0)
+	 MEM:	(needed= 6, held= 0)
+	 (RUN: 3 times, WAIT 519 msec)
+
+[2] T3_HOG (IDLE, runTime= 700 msec, idleTime= 250 msec):
+	 (tid= 0x7fb702644700)
+	 CPU1:	(needed= 1, held= 0)
+	 CPU2:	(needed= 2, held= 0)
+	 CPU3:	(needed= 3, held= 0)
+	 Mouse:	(needed= 1, held= 0)
+	 RAM:	(needed= 2, held= 0)
+	 ROM:	(needed= 2, held= 0)
+	 SRAM:	(needed= 2, held= 0)
+	 MEM:	(needed= 10, held= 0)
+	 (RUN: 3 times, WAIT 3031 msec)
+
+[3] T4_quick (IDLE, runTime= 0 msec, idleTime= 0 msec):
+	 (tid= 0x7fb701e43700)
+	 Printer:	(needed= 1, held= 0)
+	 (RUN: 3 times, WAIT 0 msec)
+
+
+Running time=5894.22ms
